@@ -22,8 +22,8 @@ con.connect(function (err) {
 
 });
 
-//incluind bcryptjs
-var bcrypt = require('bcryptjs');
+//includind bcryptjs
+let bcrypt = require('bcryptjs');
 
 //promisified db query
 let query = (queryString) => {
@@ -57,45 +57,46 @@ module.exports = {
                 address: req.body.address,
                 password: req.body.password
             };
-        
+
 
             let email = newUser.emailId;
 
+            //checking for name
             if (!newUser.name) {
 
-                return res.send(`you must provide a valid email_iyou must provide
-                 a name should be string not more than 100 charactersd`);
+                return res.status(400).send(`you must provide
+                 a name should be string not more than 100 characters`);
             }
-            //checking for name
 
+            //checking for email
             else if (!newUser.emailId) {
 
-                return res.send("you must provide a valid email_id");
+                return res.status(400).send("you must provide a valid email_id");
 
             }
-            //checking for email
 
+            //validating email id
             else if (email.indexOf('@') <= 0 || email.indexOf('.') <= 0) {
 
-                return res.send("invalid email address!");
+                return res.status(400).send("invalid email address!");
 
             }
-            //validating email id
 
+            //checking for address
             else if (!newUser.address) {
 
-                return res.send("you must provide a valid address");
+                return res.status(400).send("you must provide a valid address");
 
             }
-            //checking for address
 
+            //checking for password
             else if (!newUser.password) {
 
-                return res.send("you must choose a password max 10 characters");
+                return res.status(400).send("you must choose a password max 10 characters");
 
             }
-            //checking for password
 
+            //all well then register the user
             else {
 
 
@@ -105,7 +106,7 @@ module.exports = {
 
 
                 if (rows && rows.length > 0) {
-                    return res.send(`this email_id is already registered with c_id = ${rows[0].c_id}`);
+                    return res.status(400).send(`this email_id is already registered with c_id = ${rows[0].c_id}`);
 
                 }
 
@@ -127,7 +128,9 @@ module.exports = {
                         expiresIn: 60 // expires in 1 min
                       });
 
-                    return res.send(`you are registered now and token = ${token}`);
+                    return res.status(200).send({
+                        token : token
+                    });
 
                 }
 
@@ -136,7 +139,7 @@ module.exports = {
 
         } catch (error) {
             console.log(error);
-            return res.send(`error`);
+            return res.status(500).send(`error`);
         }
 
     },
@@ -153,13 +156,13 @@ module.exports = {
 
             if (!loginCred.emailId) {
 
-                return res.send(`you must provide a registered email id`);
+                return res.status(400).send(`you must provide a registered email id`);
 
             }
 
             else if (!loginCred.password) {
 
-                return res.send(`you must provide your password`);
+                return res.status(400).send(`you must provide your password`);
 
             }
 
@@ -174,13 +177,13 @@ module.exports = {
 
                 if (rows1.length <= 0) {
 
-                    return res.send(`email id is not registered!!`);
+                    return res.status(400).send(`email id is not registered!!`);
 
                 }
 
                 const passwordIsValid = bcrypt.compareSync(loginCred.password, rows1[0].password);
 
-                
+
                 if (passwordIsValid) {
 
                      //Auth token generate
@@ -188,19 +191,23 @@ module.exports = {
                         expiresIn: 1800 // expires in 30 min
                       });
 
-                    return res.send(`welcome! you are logged in. and token = ${token}`);
-                    
+                    return res.status(200).send({
+
+                        token : token
+
+                    });
+
 
                 } else {
 
-                    return res.send(`email id or password is incorrect`);
+                    return res.status(400).send(`email id or password is incorrect`);
 
                 };
             }
 
         } catch (error) {
             console.log(error);
-            return res.send(`error`);
+            return res.status(500).send(`error`);
         }
     },
 
@@ -213,16 +220,17 @@ module.exports = {
 
             let details = await query(queryGetDetails);
 
-            return res.send(details);
+            return res.status(200).send({details});
 
 
         } catch (error) {
             console.log(error);
-            return res.send(`error`);
+            return res.status(500).send(`error`);
         }
 
     },
 
+    //deleting details of a client
     deleteDetails: async (req, res) => {
 
         try{
@@ -231,16 +239,17 @@ module.exports = {
 
             let completeDelete = await query(queryDeleteDetails);
 
-            return res.send(`your data is deleted`);
+            return res.status(200).send(`your data is deleted`);
 
         } catch (error) {
             console.log(error);
-            return res.send(`error`);
+            return res.status(500).send(`error`);
 
         }
 
     },
 
+    //updating details of a client
     updateDetails: async (req, res) => {
 
         try {
@@ -253,11 +262,11 @@ module.exports = {
 
             let completeupdate = await query (queryUpdateDetails);
 
-            return res.send(`your data is updated`);
+            return res.status(200).send(`your data is updated`);
 
         } catch (error) {
             console.log(error);
-            return res.send(`error`);
+            return res.status(500).send(`error`);
         }
 
     },

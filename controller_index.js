@@ -1,7 +1,7 @@
 //including express
 const express = require("express");
 
-//incluind bcryptjs
+//includind bcryptjs
 const bcrypt = require('bcryptjs');
 
 //including authentication.js
@@ -26,7 +26,7 @@ const app = express();
 app.use(bodyParser.json());
 
 //using the body parser urlencoded function
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 
 //running the server
 app.listen(3100, function (req, res) {
@@ -38,16 +38,9 @@ app.listen(3100, function (req, res) {
 //getting a response
 app.get("/", verifyToken.verify, function (req, res) {
 
-    
-    res.send(`welcome user with email : ${req.email}`);
+    res.status(200).send(`welcome to the server`);
 
 });
-
-//API for registration
-app.post("/register", database.register);
-
-//API for log in
-app.post("/login", database.login);
 
 //API for register with encrypted password
 app.post("/register/encryption", auth.register);
@@ -56,10 +49,12 @@ app.post("/register/encryption", auth.register);
 app.post("/login/token", auth.login);
 
 //get details of the client
-app.get("/datails", verifyToken.verify, auth.showDetails);
+app.get("/details", verifyToken.verify, auth.showDetails);
 
 //delete details of client
 app.get("/delete", verifyToken.verify, auth.deleteDetails);
 
 //update the details of the client
 app.post("/update", verifyToken.verify, auth.updateDetails);
+
+module.exports = app;
